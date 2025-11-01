@@ -2,72 +2,118 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Hello Web!</title>
+  <title>2025年 資産推移</title>
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
       margin: 40px auto;
-      max-width: 800px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-bottom: 30px;
+      max-width: 900px;
     }
     #chart-container {
       width: 100%;
-      max-width: 700px;
+      max-width: 850px;
       margin: 0 auto;
     }
   </style>
 </head>
 <body>
-  <h1 id="message">こんにちは！</h1>
-  <button onclick="changeMessage()">メッセージを変える</button>
+  <h1>2025年 資産推移</h1>
+  <p>棒＝資産額（万円）／ 折れ線＝前月からの増減（万円）</p>
 
-  <h2>月別売上グラフ（サンプル）</h2>
   <div id="chart-container">
-    <canvas id="myChart"></canvas>
+    <canvas id="assetChart"></canvas>
   </div>
 
   <!-- Chart.js をCDNから読み込む -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <script>
-    // メッセージ切り替え
-    function changeMessage() {
-      const msg = document.getElementById("message");
-      msg.textContent = (msg.textContent === "こんにちは！") ? "ようこそGitHubへ！" : "こんにちは！";
-    }
+    // 月ラベル（10月まで）
+    const labels = [
+      "2025年1月","2025年2月","2025年3月","2025年4月","2025年5月",
+      "2025年6月","2025年7月","2025年8月","2025年9月","2025年10月"
+    ];
 
-    // グラフ描画
-    const ctx = document.getElementById('myChart');
+    // あなたの資産額（万円）
+    const assetAmounts = [4904, 4845, 4829, 4826, 4960, 5197, 5298, 5347, 5429, 5578];
 
-    // サンプルデータ
-    const labels = ["1月", "2月", "3月", "4月", "5月", "6月"];
-    const data = [120, 90, 150, 80, 180, 130];
+    // 前月からの増減を自動計算
+    const diffs = assetAmounts.map((val, idx) => {
+      if (idx === 0) return 0;               // 初月は増減なし
+      return val - assetAmounts[idx - 1];    // 前月との差
+    });
 
-    // Chart.js で棒グラフを描く
+    const ctx = document.getElementById("assetChart");
+
     new Chart(ctx, {
-      type: 'bar',
       data: {
         labels: labels,
-        datasets: [{
-          label: '売上（万円）',
-          data: data,
-          // 色はChart.jsが自動でつけるから指定しなくてもOK
-        }]
+        datasets: [
+          {
+            type: "bar",
+            label: "資産額（万円）",
+            data: assetAmounts,
+            yAxisID: "yAssets"
+          },
+          {
+            type: "line",
+            label: "増減額（万円）",
+            data: diffs,
+            yAxisID: "yDiffs",
+            tension: 0.3,
+            pointRadius: 4
+          }
+        ]
       },
       options: {
         responsive: true,
+        interaction: {
+          mode: "index",
+          intersect: false
+        },
+        stacked: false,
         scales: {
-          y: {
-            beginAtZero: true,
+          // 左：資産額（大きい方）
+          yAssets: {
+            type: "linear",
+            position: "left",
             title: {
               display: true,
-              text: '万円'
+              text: "資産額（万円）"
+            },
+            // このへんは好みで
+            suggestedMin: 4700,
+            suggestedMax: 5700
+          },
+          // 右：増減額（小さい方）
+          yDiffs: {
+            type: "linear",
+            position: "right",
+            title: {
+              display: true,
+              text: "増減額（万円）"
+            },
+            beginAtZero: true,
+            // マイナスも見えるように
+            suggestedMin: -100,
+            suggestedMax: 250,
+            grid: {
+              drawOnChartArea: false
             }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.dataset.label || "";
+                const value = context.raw;
+                return `${label}: ${value} 万円`;
+              }
+            }
+          },
+          legend: {
+            display: true
           }
         }
       }
