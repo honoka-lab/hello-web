@@ -5,45 +5,55 @@
   <title>2025年 資産推移</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Hiragino Maru Gothic ProN', 'Arial Rounded MT Bold', sans-serif;
+      background-color: #fffafc;
+      color: #555;
       text-align: center;
       margin: 40px auto;
       max-width: 900px;
+    }
+    h1 {
+      color: #e86e94;
     }
     #chart-container {
       width: 100%;
       max-width: 850px;
       margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      padding: 30px;
+    }
+    canvas {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>2025年 資産推移</h1>
-  <p>棒＝資産額（万円）／ 折れ線＝前月からの増減（万円）</p>
+  <h1>2025年 資産推移 🌷</h1>
+  <p>棒グラフ：資産額（万円）／ 折れ線：前月からの増減（万円）</p>
 
   <div id="chart-container">
     <canvas id="assetChart"></canvas>
   </div>
 
-  <!-- Chart.js をCDNから読み込む -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    // 月ラベル（10月まで）
     const labels = [
       "2025年1月","2025年2月","2025年3月","2025年4月","2025年5月",
       "2025年6月","2025年7月","2025年8月","2025年9月","2025年10月"
     ];
 
-    // あなたの資産額（万円）
     const assetAmounts = [4904, 4845, 4829, 4826, 4960, 5197, 5298, 5347, 5429, 5578];
-
-    // 前月からの増減を自動計算
-    const diffs = assetAmounts.map((val, idx) => {
-      if (idx === 0) return 0;               // 初月は増減なし
-      return val - assetAmounts[idx - 1];    // 前月との差
-    });
+    const diffs = assetAmounts.map((v,i)=> i===0 ? 0 : v - assetAmounts[i-1]);
 
     const ctx = document.getElementById("assetChart");
+
+    // 可愛い色パレット
+    const pink = "rgba(255, 153, 204, 0.7)";
+    const pinkDark = "rgba(255, 105, 180, 1)";
+    const gray = "rgba(200, 200, 200, 0.6)";
+    const mint = "rgba(153, 230, 204, 1)";
 
     new Chart(ctx, {
       data: {
@@ -53,67 +63,57 @@
             type: "bar",
             label: "資産額（万円）",
             data: assetAmounts,
-            yAxisID: "yAssets"
+            yAxisID: "yAssets",
+            backgroundColor: pink,
+            borderRadius: 6,
+            borderColor: pinkDark,
+            borderWidth: 1
           },
           {
             type: "line",
             label: "増減額（万円）",
             data: diffs,
             yAxisID: "yDiffs",
-            tension: 0.3,
-            pointRadius: 4
+            tension: 0.4,
+            borderColor: mint,
+            backgroundColor: "rgba(153,230,204,0.3)",
+            pointBackgroundColor: diffs.map(v => v >= 0 ? mint : gray),
+            pointBorderColor: diffs.map(v => v >= 0 ? mint : gray),
+            pointRadius: 5,
+            pointHoverRadius: 7
           }
         ]
       },
       options: {
         responsive: true,
-        interaction: {
-          mode: "index",
-          intersect: false
-        },
-        stacked: false,
+        interaction: { mode: "index", intersect: false },
         scales: {
-          // 左：資産額（大きい方）
           yAssets: {
-            type: "linear",
             position: "left",
-            title: {
-              display: true,
-              text: "資産額（万円）"
-            },
-            // このへんは好みで
+            title: { display: true, text: "資産額（万円）" },
             suggestedMin: 4700,
-            suggestedMax: 5700
+            suggestedMax: 5700,
+            grid: { color: "rgba(255,182,193,0.2)" }
           },
-          // 右：増減額（小さい方）
           yDiffs: {
-            type: "linear",
             position: "right",
-            title: {
-              display: true,
-              text: "増減額（万円）"
-            },
-            beginAtZero: true,
-            // マイナスも見えるように
+            title: { display: true, text: "増減額（万円）" },
             suggestedMin: -100,
             suggestedMax: 250,
-            grid: {
-              drawOnChartArea: false
-            }
+            grid: { drawOnChartArea: false }
           }
         },
         plugins: {
+          legend: { labels: { color: "#666" } },
           tooltip: {
+            backgroundColor: "#ffe6ef",
+            titleColor: "#e86e94",
+            bodyColor: "#444",
+            borderColor: "#ffc0cb",
+            borderWidth: 1,
             callbacks: {
-              label: function(context) {
-                const label = context.dataset.label || "";
-                const value = context.raw;
-                return `${label}: ${value} 万円`;
-              }
+              label: ctx => `${ctx.dataset.label}: ${ctx.raw} 万円`
             }
-          },
-          legend: {
-            display: true
           }
         }
       }
