@@ -2,41 +2,139 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>2025年 資産推移</title>
+  <title>資産推移（2017年10月〜2025年10月）</title>
   <style>
     body {
       font-family: 'Hiragino Maru Gothic ProN', 'Arial Rounded MT Bold', sans-serif;
       background-color: #fffafc;
       color: #555;
       text-align: center;
-      margin: 40px auto;
-      max-width: 900px;
+      margin: 30px auto;
+      max-width: 1000px;
     }
-    h1 { color: #e86e94; }
-    #chart-container {
+    h1 {
+      color: #e86e94;
+    }
+    p {
+      margin-bottom: 15px;
+    }
+    /* 横スクロールできるようにする */
+    .scroll-wrapper {
       width: 100%;
-      max-width: 850px;
+      overflow-x: auto;
+    }
+    #chart-container {
+      /* グラフ側を広めにしておく → スクロールで見られる */
+      width: 1800px;
       margin: 0 auto;
-      background-color: #ffffff;
+      background-color: #fff;
       border-radius: 20px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      padding: 30px;
+      padding: 25px 25px 10px;
     }
   </style>
 </head>
 <body>
-  <h1>2025年 資産推移 🌷</h1>
-  <p>棒＝資産額（万円）／ 線＝前月との差</p>
+  <h1>資産推移（2017年10月〜2025年10月）🌷</h1>
+  <p>ピンク：資産額（万円）／ ミント：前月との差（万円）</p>
 
-  <div id="chart-container">
-    <canvas id="assetChart"></canvas>
+  <div class="scroll-wrapper">
+    <div id="chart-container">
+      <canvas id="assetChart" height="300"></canvas>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    // ★ここだけ毎月足すゾーン★
-    // month: "表示したい名前", value: 資産額（万円）
+    // ★ここがあなたの実データ（画像から起こしたやつ）
     const assetData = [
+      { month: "2017年10月", value: 1474 },
+      { month: "2017年10月", value: 1484 },
+      { month: "2017年11月", value: 1494 },
+      { month: "2017年12月", value: 1561 },
+      { month: "2018年1月",  value: 1582 },
+      { month: "2018年2月",  value: 1579 },
+      { month: "2018年3月",  value: 1588 },
+      { month: "2018年4月",  value: 1594 },
+      { month: "2018年5月",  value: 1603 },
+      { month: "2018年6月",  value: 1644 },
+      { month: "2018年7月",  value: 1665 },
+      { month: "2018年8月",  value: 1657 },
+      { month: "2018年9月",  value: 1650 },
+      { month: "2018年10月", value: 1639 },
+      { month: "2018年11月", value: 1674 },
+      { month: "2018年12月", value: 1667 },
+
+      { month: "2019年1月",  value: 1721 },
+      { month: "2019年2月",  value: 1730 },
+      { month: "2019年3月",  value: 1734 },
+      { month: "2019年4月",  value: 1725 },
+      { month: "2019年5月",  value: 1745 },
+      { month: "2019年6月",  value: 1808 },
+      { month: "2019年7月",  value: 1865 },
+      { month: "2019年8月",  value: 1856 },
+      { month: "2019年9月",  value: 1881 },
+      { month: "2019年10月", value: 1883 },
+      { month: "2019年11月", value: 1883 },
+      { month: "2019年12月", value: 1938 },
+
+      { month: "2020年1月",  value: 1968 },
+      { month: "2020年2月",  value: 1951 },
+      { month: "2020年3月",  value: 1940 },
+      { month: "2020年4月",  value: 1984 },
+      { month: "2020年5月",  value: 1929 },
+      { month: "2020年6月",  value: 1994 },
+      { month: "2020年7月",  value: 2003 },
+      { month: "2020年8月",  value: 2030 },
+      { month: "2020年9月",  value: 2075 },
+      { month: "2020年10月", value: 2090 },
+      { month: "2020年11月", value: 2147 },
+      { month: "2020年12月", value: 2209 },
+
+      { month: "2021年1月",  value: 2247 },
+      { month: "2021年2月",  value: 2266 },
+      { month: "2021年3月",  value: 2307 },
+      { month: "2021年4月",  value: 2323 },
+      { month: "2021年5月",  value: 2350 },
+      { month: "2021年6月",  value: 2432 },
+      { month: "2021年7月",  value: 2445 },
+      { month: "2021年8月",  value: 2490 },
+      { month: "2021年9月",  value: 2498 },
+      { month: "2021年10月", value: 2533 },
+      { month: "2021年11月", value: 2529 },
+      { month: "2021年12月", value: 2608 },
+
+      { month: "2022年2月",  value: 2616 },
+      { month: "2022年3月",  value: 2619 },
+      { month: "2022年4月",  value: 2662 },
+      { month: "2022年5月",  value: 2656 },
+      { month: "2022年6月",  value: 2669 },
+      { month: "2022年8月",  value: 2740 },
+      { month: "2022年11月", value: 2772 },
+      { month: "2022年12月", value: 2778 },
+      { month: "2022年12月", value: 2815 },  // データに2回出てたのでそのまま入れてる
+      { month: "2023年1月",  value: 2850 },
+      { month: "2023年2月",  value: 2887 },
+      { month: "2023年3月",  value: 2885 },
+      { month: "2023年5月",  value: 2956 },
+      { month: "2023年6月",  value: 3117 },
+      { month: "2023年8月",  value: 4020 },
+      { month: "2023年10月", value: 4017 },
+      { month: "2023年11月", value: 4154 },
+      { month: "2023年12月", value: 4383 },
+
+      { month: "2024年1月",  value: 4382 },
+      { month: "2024年3月",  value: 4502 },
+      { month: "2024年4月",  value: 4507 },
+      { month: "2024年5月",  value: 4552 },
+      { month: "2024年6月",  value: 4724 },
+      { month: "2024年7月",  value: 4735 },
+      { month: "2024年8月",  value: 4717 },
+      { month: "2024年9月",  value: 4728 },
+      { month: "2024年10月", value: 4831 },
+      { month: "2024年11月", value: 4759 },
+      { month: "2024年12月", value: 4909 },
+
       { month: "2025年1月",  value: 4904 },
       { month: "2025年2月",  value: 4845 },
       { month: "2025年3月",  value: 4829 },
@@ -46,17 +144,14 @@
       { month: "2025年7月",  value: 5298 },
       { month: "2025年8月",  value: 5347 },
       { month: "2025年9月",  value: 5429 },
-      { month: "2025年10月", value: 5578 },
-      // ↓11月が出たらここに1行足すだけ！
-      // { month: "2025年11月", value: 5650 },
-      // { month: "2025年12月", value: 5780 },
+      { month: "2025年10月", value: 5578 }
     ];
 
-    // ↓ここから下は毎月いじらんでOK
+    // ラベルと値を分解
     const labels = assetData.map(d => d.month);
     const assetAmounts = assetData.map(d => d.value);
 
-    // 増減を自動計算
+    // 前月との差分を自動で計算
     const diffs = assetAmounts.map((v, i) => {
       if (i === 0) return 0;
       return v - assetAmounts[i - 1];
@@ -66,7 +161,7 @@
 
     const pink = "rgba(255, 153, 204, 0.7)";
     const pinkDark = "rgba(255, 105, 180, 1)";
-    const gray = "rgba(200, 200, 200, 0.6)";
+    const gray = "rgba(200, 200, 200, 0.7)";
     const mint = "rgba(153, 230, 204, 1)";
 
     new Chart(ctx, {
@@ -81,44 +176,68 @@
             backgroundColor: pink,
             borderColor: pinkDark,
             borderWidth: 1,
-            borderRadius: 6
+            borderRadius: 4,
+            barPercentage: 0.9,
+            categoryPercentage: 1.0
           },
           {
             type: "line",
             label: "増減額（万円）",
             data: diffs,
             yAxisID: "yDiffs",
-            tension: 0.4,
+            tension: 0.3,
             borderColor: mint,
             backgroundColor: "rgba(153,230,204,0.25)",
             pointBackgroundColor: diffs.map(v => v >= 0 ? mint : gray),
             pointBorderColor: diffs.map(v => v >= 0 ? mint : gray),
-            pointRadius: 5
+            pointRadius: 3,
+            pointHoverRadius: 5
           }
         ]
       },
       options: {
-        responsive: true,
-        interaction: { mode: "index", intersect: false },
+        responsive: false,   // 横長にしてるのでfalse
+        interaction: {
+          mode: "index",
+          intersect: false
+        },
+        stacked: false,
         scales: {
           yAssets: {
             position: "left",
-            title: { display: true, text: "資産額（万円）" },
-            // 範囲はデータ見て自動にするならコメントアウトでもOK
-            suggestedMin: 4700,
-            suggestedMax: 5800,
-            grid: { color: "rgba(255,182,193,0.2)" }
+            title: {
+              display: true,
+              text: "資産額（万円）"
+            },
+            suggestedMin: 1400,
+            suggestedMax: 6000,
+            grid: {
+              color: "rgba(255,182,193,0.25)"
+            }
           },
           yDiffs: {
             position: "right",
-            title: { display: true, text: "増減額（万円）" },
-            suggestedMin: -100,
-            suggestedMax: 250,
-            grid: { drawOnChartArea: false }
+            title: {
+              display: true,
+              text: "増減額（万円）"
+            },
+            suggestedMin: -200,
+            suggestedMax: 1200,   // 2023年でドンと増えてるので広めに
+            grid: {
+              drawOnChartArea: false
+            }
+          },
+          x: {
+            ticks: {
+              maxRotation: 60,
+              minRotation: 60
+            }
           }
         },
         plugins: {
-          legend: { labels: { color: "#666" } },
+          legend: {
+            labels: { color: "#555" }
+          },
           tooltip: {
             backgroundColor: "#ffe6ef",
             titleColor: "#e86e94",
