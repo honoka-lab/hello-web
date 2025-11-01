@@ -3,36 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <title>資産推移（2017年10月〜2025年10月）</title>
-  <style>
-    body {
-      font-family: 'Hiragino Maru Gothic ProN', 'Arial Rounded MT Bold', sans-serif;
-      background-color: #fffafc;
-      color: #555;
-      text-align: center;
-      margin: 30px auto;
-      max-width: 1000px;
-    }
-    h1 {
-      color: #e86e94;
-    }
-    p {
-      margin-bottom: 15px;
-    }
-    /* 横スクロールできるようにする */
-    .scroll-wrapper {
-      width: 100%;
-      overflow-x: auto;
-    }
-    #chart-container {
-      /* グラフ側を広めにしておく → スクロールで見られる */
-      width: 1800px;
-      margin: 0 auto;
-      background-color: #fff;
-      border-radius: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      padding: 25px 25px 10px;
-    }
-  </style>
+ <style>
+  body {
+    font-family: 'Hiragino Maru Gothic ProN', 'Arial Rounded MT Bold', sans-serif;
+    background-color: #fffafc;
+    color: #555;
+    text-align: center;
+    margin: 30px auto;
+    max-width: 100%;
+  }
+  h1 { color: #e86e94; }
+  p { margin-bottom: 15px; }
+
+  /* 横スクロール対応 */
+  .scroll-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+  #chart-container {
+    width: 2600px;  /* ← グラフ領域をさらに横に広げる */
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    padding: 40px 40px 20px;
+  }
+  canvas {
+    height: 500px !important; /* ← 高さをしっかり確保 */
+  }
+</style>
 </head>
 <body>
   <h1>資産推移（2017年10月〜2025年10月）🌷</h1>
