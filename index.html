@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Hello Web!</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 100px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="message">こんにちは！</h1>
+  <button onclick="changeMessage()">メッセージを変える</button>
+
+  <script>
+    function changeMessage() {
+      const msg = document.getElementById("message");
+      msg.textContent = (msg.textContent === "こんにちは！") ? "ようこそGitHubへ！" : "こんにちは！";
+    }
+  </script>
+</body>
+</html>
