@@ -3,35 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <title>資産推移（2017年10月〜2025年10月）</title>
- <style>
-  body {
-    font-family: 'Hiragino Maru Gothic ProN', 'Arial Rounded MT Bold', sans-serif;
-    background-color: #fffafc;
-    color: #555;
-    text-align: center;
-    margin: 30px auto;
-    max-width: 100%;
-  }
-  h1 { color: #e86e94; }
-  p { margin-bottom: 15px; }
+  <style>
+    body {
+      font-family: 'Hiragino Maru Gothic ProN', 'Arial Rounded MT Bold', sans-serif;
+      background-color: #fffafc;
+      color: #555;
+      text-align: center;
+      margin: 30px auto;
+      max-width: 100%;
+    }
+    h1 { color: #e86e94; }
+    p { margin-bottom: 15px; }
 
-  /* 横スクロール対応 */
-  .scroll-wrapper {
-    width: 100%;
-    overflow-x: auto;
-  }
-  #chart-container {
-    width: 4000px;  /* ← グラフ領域をさらに横に広げる */
-    margin: 0 auto;
-    background-color: #fff;
-    border-radius: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    padding: 40px 40px 20px;
-  }
-  canvas {
-    height: 500px !important; /* ← 高さをしっかり確保 */
-  }
-</style>
+    /* 横スクロールできるようにする */
+    .scroll-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    /* ←ここでがっつり幅を取る */
+    #chart-container {
+      width: 4000px;             /* ★ 横を4,000pxに固定 */
+      margin: 0 auto;
+      background-color: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      padding: 40px 40px 20px;
+    }
+
+    /* Safariでも縮まないようにする */
+    #assetChart {
+      width: 4000px !important;   /* ★ canvas自体も4,000px */
+      height: 520px !important;   /* ★ 見やすい高さ */
+      display: block;
+    }
+  </style>
 </head>
 <body>
   <h1>資産推移（2017年10月〜2025年10月）🌷</h1>
@@ -39,13 +45,13 @@
 
   <div class="scroll-wrapper">
     <div id="chart-container">
-      <canvas id="assetChart" height="300"></canvas>
+      <!-- width/heightもHTML側で指定しておくとSafariが素直になる -->
+      <canvas id="assetChart" width="4000" height="520"></canvas>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    // ★ここがあなたの実データ（画像から起こしたやつ）
     const assetData = [
       { month: "2017年10月", value: 1474 },
       { month: "2017年10月", value: 1484 },
@@ -111,7 +117,7 @@
       { month: "2022年8月",  value: 2740 },
       { month: "2022年11月", value: 2772 },
       { month: "2022年12月", value: 2778 },
-      { month: "2022年12月", value: 2815 },  // データに2回出てたのでそのまま入れてる
+      { month: "2022年12月", value: 2815 },
       { month: "2023年1月",  value: 2850 },
       { month: "2023年2月",  value: 2887 },
       { month: "2023年3月",  value: 2885 },
@@ -146,15 +152,9 @@
       { month: "2025年10月", value: 5578 }
     ];
 
-    // ラベルと値を分解
     const labels = assetData.map(d => d.month);
     const assetAmounts = assetData.map(d => d.value);
-
-    // 前月との差分を自動で計算
-    const diffs = assetAmounts.map((v, i) => {
-      if (i === 0) return 0;
-      return v - assetAmounts[i - 1];
-    });
+    const diffs = assetAmounts.map((v,i) => i === 0 ? 0 : v - assetAmounts[i-1]);
 
     const ctx = document.getElementById("assetChart");
 
@@ -195,36 +195,22 @@
         ]
       },
       options: {
-        responsive: false,   // 横長にしてるのでfalse
-        interaction: {
-          mode: "index",
-          intersect: false
-        },
-        stacked: false,
+        responsive: false,  // ←ここも固定しておくとSafariで縮みにくい
+        interaction: { mode: "index", intersect: false },
         scales: {
           yAssets: {
             position: "left",
-            title: {
-              display: true,
-              text: "資産額（万円）"
-            },
+            title: { display: true, text: "資産額（万円）" },
             suggestedMin: 1400,
             suggestedMax: 6000,
-            grid: {
-              color: "rgba(255,182,193,0.25)"
-            }
+            grid: { color: "rgba(255,182,193,0.25)" }
           },
           yDiffs: {
             position: "right",
-            title: {
-              display: true,
-              text: "増減額（万円）"
-            },
+            title: { display: true, text: "増減額（万円）" },
             suggestedMin: -200,
-            suggestedMax: 1200,   // 2023年でドンと増えてるので広めに
-            grid: {
-              drawOnChartArea: false
-            }
+            suggestedMax: 1200,
+            grid: { drawOnChartArea: false }
           },
           x: {
             ticks: {
@@ -234,19 +220,7 @@
           }
         },
         plugins: {
-          legend: {
-            labels: { color: "#555" }
-          },
-          tooltip: {
-            backgroundColor: "#ffe6ef",
-            titleColor: "#e86e94",
-            bodyColor: "#444",
-            borderColor: "#ffc0cb",
-            borderWidth: 1,
-            callbacks: {
-              label: (ctx) => `${ctx.dataset.label}: ${ctx.raw} 万円`
-            }
-          }
+          legend: { labels: { color: "#555" } }
         }
       }
     });
