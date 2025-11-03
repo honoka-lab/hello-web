@@ -247,16 +247,26 @@
     }
   });
 
-  // 年を昇順に並べて配列化
+   // 年を昇順に並べて配列化
   const yearKeys = Object.keys(yearlyLatest).map(Number).sort((a, b) => a - b);
   const yearLabels = [];
   const yearEndValues = [];
   const yearDiffs = [];
 
   yearKeys.forEach((y, i) => {
-    yearLabels.push(y + "年");
-    const val = yearlyLatest[y].value;
+    const latest = yearlyLatest[y];  // {month: 10, value: 5578} みたいなやつ
+    const isFullYear = latest.month === 12;
+
+    // ★ここでラベルを出し分ける
+    const label = isFullYear
+      ? `${y}年`
+      : `${y}年（${latest.month}月時点）`;
+
+    yearLabels.push(label);
+
+    const val = latest.value;
     yearEndValues.push(val);
+
     if (i === 0) {
       yearDiffs.push(0);
     } else {
@@ -303,7 +313,7 @@
       plugins: {
         title: {
           display: true,
-          text: "年末時点の資産と前年比の増加額 🪴",
+          text: "年末時点の資産と前年比の増加額（最新年は最新月時点） 🪴",
           font: { size: 18 }
         },
         tooltip: {
