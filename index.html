@@ -50,6 +50,11 @@
     </div>
   </div>
 
+    <!-- ▼ここから追加部分（年次グラフ）▼ -->
+  <h2 style="margin-top:60px;">年ごとのまとめグラフ 🎯</h2>
+  <canvas id="yearSummaryChart" width="1100" height="420"></canvas>
+  <!-- ▲ここまで追加部分▲ -->
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     const assetData = [
@@ -224,6 +229,104 @@
         }
       }
     });
+
+  // =========================
+  // 年次データを自動で抽出して複合グラフを描画
+  // =========================
+
+  // 年ごとにその年で一番新しい月のデータを抽出
+  const yearlyLatest = {};
+  assetData.forEach(d => {
+    const m = d.month.match(/(\d{4})年(\d{1,2})月/);
+    if (!m) return;
+    const year = m[1];
+    const month = Number(m[2]);
+    const value = d.value;
+    if (!yearlyLatest[year] || month > yearlyLatest[year].month) {
+      yearlyLatest[year] = { month, value };
+    }
+  });
+
+  // 年を昇順に並べて配列化
+  const yearKeys = Object.keys(yearlyLatest).map(Number).sort((a, b) => a - b);
+  const yearLabels = [];
+  const yearEndValues = [];
+  const yearDiffs = [];
+
+  yearKeys.forEach((y, i) => {
+    yearLabels.push(y + "年");
+    const val = yearlyLatest[y].value;
+    yearEndValues.push(val);
+    if (i === 0) {
+      yearDiffs.push(0);
+    } else {
+      yearDiffs.push(val - yearlyLatest[yearKeys[i - 1]].value);
+    }
+  });
+
+  // キャンバスを取得
+  const ctxYear = document.getElementById("yearSummaryChart").getContext("2d");
+
+  // カラー設定
+  const pastelBars = yearEndValues.map(() => "rgba(255, 182, 193, 0.75)");
+  const lineColor = "rgba(153, 230, 204, 1)";
+
+  new Chart(ctxYear, {
+    data: {
+      labels: yearLabels,
+      datasets: [
+        {
+          type: "bar",
+          label: "年末資産額（万円）",
+          data: yearEndValues,
+          yAxisID: "yLeft",
+          backgroundColor: pastelBars,
+          borderColor: "rgba(255, 105, 180, 1)",
+          borderWidth: 1,
+          borderRadius: 6
+        },
+        {
+          type: "line",
+          label: "前年からの増加額（万円）",
+          data: yearDiffs,
+          yAxisID: "yRight",
+          borderColor: lineColor,
+          backgroundColor: "rgba(153, 230, 204, 0.25)",
+          tension: 0.3,
+          pointBackgroundColor: yearDiffs.map(v => v >= 0 ? lineColor : "rgba(200,200,200,1)"),
+          pointRadius: 5
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: "年末時点の資産と前年比の増加額 🪴",
+          font: { size: 18 }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${ctx.raw} 万円`
+          }
+        }
+      },
+      scales: {
+        yLeft: {
+          position: "left",
+          title: { display: true, text: "資産額（万円）" },
+          suggestedMin: 0
+        },
+        yRight: {
+          position: "right",
+          title: { display: true, text: "前年比の増加額（万円）" },
+          grid: { drawOnChartArea: false }
+        }
+      }
+    }
+  });
+    
   </script>
 </body>
 </html>
